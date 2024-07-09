@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from .models import Place, Image, Coordinates
 
 
@@ -11,6 +13,14 @@ class CoordinatesInline(admin.StackedInline):
 class ImageInline(admin.TabularInline):
     model = Image
     extra = 1
+    readonly_fields = ["preview"]
+    fields = ["image", "preview", "order"]
+
+    def preview(self, obj):
+        return format_html(
+            '<img src="{}" style="width: 200px; height: 200px; object-fit: cover;" />',
+            obj.image.url,
+        )
 
 
 @admin.register(Place)
