@@ -27,7 +27,6 @@ class Image(models.Model):
     image = models.ImageField(upload_to="images/")
 
     class Meta:
-        unique_together = ["place", "order"]
         ordering = ["order"]
 
     def __str__(self):

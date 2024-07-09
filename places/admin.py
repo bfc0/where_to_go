@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
 from .models import Place, Image, Coordinates
 
 
@@ -10,11 +11,11 @@ class CoordinatesInline(admin.StackedInline):
     verbose_name_plural = Coordinates
 
 
-class ImageInline(admin.TabularInline):
+class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
     model = Image
     extra = 1
     readonly_fields = ["preview"]
-    fields = ["image", "preview", "order"]
+    fields = ["image", "preview"]
 
     def preview(self, obj):
         return format_html(
@@ -24,6 +25,6 @@ class ImageInline(admin.TabularInline):
 
 
 @admin.register(Place)
-class PlacesAdmin(admin.ModelAdmin):
+class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
     inlines = [CoordinatesInline, ImageInline]
     list_display = ["title", "description_short", "description_long"]
