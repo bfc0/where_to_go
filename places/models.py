@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Place(models.Model):
@@ -9,6 +10,9 @@ class Place(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+    def get_api_url(self):
+        return reverse("details", args=[self.id])
 
 
 class Coordinates(models.Model):
