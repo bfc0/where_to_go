@@ -1,7 +1,5 @@
-import html
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils.safestring import mark_safe
 from .models import Place
 from .serializers import serialize_places
 
@@ -19,7 +17,7 @@ def details(request, id):
     as_dict = {
         "title": place.title,
         "description_short": place.description_short,
-        "description_long": mark_safe(html.unescape(place.description_long)),
+        "description_long": place.description_long,
         "coordinates": {
             "lng": place.coordinates.lng,
             "lat": place.coordinates.lat,
