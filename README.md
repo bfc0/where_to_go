@@ -54,4 +54,9 @@ python manage.py importplace placename.json
 }
 ```
 
+### .env contents:
+DJANGO_SECRET=django_secret_key
+
+DJANGO_DEBUG=False
+
 
