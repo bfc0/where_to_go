@@ -4,4 +4,5 @@ scratch*
 .env
 media*
 staticfiles
+placesdb.sqlite3
 
