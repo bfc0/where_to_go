@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
 from django.db import models
 from tinymce.widgets import TinyMCE
@@ -30,6 +29,8 @@ class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
 class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
     inlines = [CoordinatesInline, ImageInline]
     list_display = ["title", "description_short", "description_long"]
+    list_filter=["title"]
+    search_fields=["title"]
 
     formfield_overrides = {
         models.TextField: {"widget": TinyMCE()},

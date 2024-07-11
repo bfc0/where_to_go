@@ -6,9 +6,9 @@ from .serializers import serialize_places
 
 def all_places(request):
     places = Place.objects.prefetch_related("imgs")
-    serialized = serialize_places(places)
+    serialized_places = serialize_places(places)
 
-    return render(request, "index.html", {"places": serialized})
+    return render(request, "index.html", {"places": serialized_places})
 
 
 def details(request, id):
