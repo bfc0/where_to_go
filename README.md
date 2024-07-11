@@ -25,6 +25,7 @@ python manage.py collectstatic
 python manage.py runserver
 ```
 ## Populate Data:
+[Data](https://github.com/devmanorg/where-to-go-places/tree/master)
 ```bash
 git clone https://github.com/devmanorg/where-to-go-places.git somewhere
 python manage.py importdir somewhere/places/
@@ -32,7 +33,7 @@ python manage.py importdir somewhere/places/
 
 you can also import data from a single json file:
 ```bash
-python manage.py importfile placename.json
+python manage.py importplace placename.json
 ```
 
 ### json format:
