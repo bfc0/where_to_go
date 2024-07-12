@@ -55,8 +55,19 @@ python manage.py importplace placename.json
 ```
 
 ### .env contents:
-DJANGO_SECRET=django_secret_key
-
+```
+DJANGO_SECRET=django_secret_key   
 DJANGO_DEBUG=False
+```
+
+**DJANGO_SECRET** - A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.   
+[SECRET_KEY](https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-SECRET_KEY)
+
+**ALLOWED_HOSTS** - A list of strings representing the host/domain names that this Django site can serve. This is a security measure to prevent HTTP Host header attacks, which are possible even under many seemingly-safe web server configurations.  
+[ALLOWED_HOSTS](https://docs.djangoproject.com/en/5.0/ref/settings/#allowed-hosts)
 
 
+**DEBUG** - A boolean that turns on/off debug mode. If your app raises an exception when DEBUG is True, Django will display a detailed traceback, including a lot of metadata about your environment, such as all the currently defined Django settings (from settings.py).  
+[DEBUG](https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-DEBUG)
+
+ALLOWED_HOSTS must be set when DEBUG is turned off

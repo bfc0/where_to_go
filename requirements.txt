@@ -2,7 +2,7 @@ Django==5.0.7
 django-admin-sortable2==2.2.1
 django-tinymce==4.1.0
 pillow==10.4.0
-python-dotenv==1.0.1
 requests==2.32.3
 urllib3==2.2.2
 whitenoise==6.7.0
+environs==11.0.0
