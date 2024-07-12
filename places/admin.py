@@ -1,9 +1,11 @@
 from django.contrib import admin
+from django.urls import reverse
 from django.utils.html import format_html
 from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
 from django.db import models
 from tinymce.widgets import TinyMCE
 from .models import Place, Image
+PREVIEW_WIDTH = PREVIEW_HEIGHT = 200
 
 
 class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
@@ -14,8 +16,10 @@ class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
 
     def preview(self, obj):
         return format_html(
-            '<img src="{}" style="width: 200px; height: 200px; object-fit: cover;" />',
+            '<img src="{}" style="max-width: {}px; max-height: {}px; object-fit: cover;" />',
             obj.image.url,
+            PREVIEW_WIDTH,
+            PREVIEW_HEIGHT
         )
 
 
@@ -30,3 +34,22 @@ class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {"widget": TinyMCE()},
     }
+
+
+@admin.register(Image)
+class ImagesAdmin(admin.ModelAdmin):
+    fields = ["image",  "place", "order", "preview"]
+    list_display = ["preview", "place"]
+    readonly_fields = ["preview"]
+    autocomplete_fields = ["place"]
+    search_fields = ["place__title"]
+
+    def preview(self, obj):
+        url = reverse('admin:places_image_change', args=[obj.id])
+        return format_html(
+            '<a href="{}"><img src="{}" style="max-width: {}px; max-height: {}px; object-fit: cover;" /></a>',
+            url,
+            obj.image.url,
+            PREVIEW_WIDTH,
+            PREVIEW_HEIGHT
+        )

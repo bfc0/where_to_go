@@ -14,14 +14,16 @@ class Command(BaseCommand):
         directory = options["directory"]
 
         if not os.path.isdir(directory):
-            self.stdout.write(self.style.ERROR(f"{directory} is not a valid directory"))
+            self.stdout.write(self.style.ERROR(
+                f"{directory} is not a valid directory"))
             return
 
         json_files = [f for f in os.listdir(directory) if f.endswith(".json")]
 
         if not json_files:
             self.stdout.write(
-                self.style.WARNING(f"No JSON files found in directory: {directory}")
+                self.style.WARNING(
+                    f"No JSON files found in directory: {directory}")
             )
             return
 
@@ -35,4 +37,3 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.ERROR(f"Failed to import {place_filepath}: {e}")
                 )
-
