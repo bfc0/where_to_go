@@ -15,8 +15,10 @@ class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
     fields = ["image", "preview"]
 
     def preview(self, obj):
+        url = reverse('admin:places_image_change', args=[obj.id])
         return format_html(
-            '<img src="{}" style="max-width: {}px; max-height: {}px; object-fit: cover;" />',
+            "<a href='{}'><img src='{}' style='max-width: {}px; max-height: {}px; object-fit: cover;' /></a>",
+            url,
             obj.image.url,
             PREVIEW_WIDTH,
             PREVIEW_HEIGHT
@@ -26,8 +28,10 @@ class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
 @admin.register(Place)
 class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
     inlines = [ImageInline]
-    list_display = ["title", "short_description",
-                    "long_description", "longitude", "latitude"]
+    fields = ["title", "longitude", "latitude", "short_description",
+              "long_description"]
+    list_display = ["title", "longitude", "latitude", "short_description",
+                    "long_description"]
     list_filter = ["title"]
     search_fields = ["title"]
 
@@ -47,7 +51,8 @@ class ImagesAdmin(admin.ModelAdmin):
     def preview(self, obj):
         url = reverse('admin:places_image_change', args=[obj.id])
         return format_html(
-            '<a href="{}"><img src="{}" style="max-width: {}px; max-height: {}px; object-fit: cover;" /></a>',
+
+            "<a href='{}'><img src='{}' style='max-width: {}px; max-height: {}px; object-fit: cover;' /></a>",
             url,
             obj.image.url,
             PREVIEW_WIDTH,
