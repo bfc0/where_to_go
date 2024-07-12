@@ -15,7 +15,7 @@ def details(request, place_id):
     place: Place = get_object_or_404(
         Place.objects.prefetch_related("imgs"), id=place_id)
 
-    as_dict = {
+    serialized_place = {
         "title": place.title,
         "description_short": place.short_description,
         "description_long": place.long_description,
@@ -26,4 +26,4 @@ def details(request, place_id):
         "imgs": [img.image.url for img in place.imgs.all()],
     }
 
-    return JsonResponse(as_dict, json_dumps_params={"ensure_ascii": False})
+    return JsonResponse(serialized_place, json_dumps_params={"ensure_ascii": False})

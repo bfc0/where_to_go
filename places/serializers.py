@@ -2,14 +2,9 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
-def serialize_places(places_list):
-    result = {
-        "type": "FeatureCollection",
-        "features": [],
-    }
-
-    for place in places_list:
-        feature = {
+def serialize_places(places):
+    features = [
+        {
             "type": "Feature",
             "geometry": {
                 "type": "Point",
@@ -21,5 +16,12 @@ def serialize_places(places_list):
                 "detailsUrl": place.get_api_url(),
             },
         }
-        result["features"].append(feature)
-    return json.dumps(result, ensure_ascii=False, cls=DjangoJSONEncoder, indent=4)
+        for place in places
+    ]
+
+    map_points = {
+        "type": "FeatureCollection",
+        "features": features,
+    }
+
+    return json.dumps(map_points, ensure_ascii=False, cls=DjangoJSONEncoder, indent=4)

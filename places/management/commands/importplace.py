@@ -5,9 +5,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from places.models import Place, Image
+MAX_TRIES = 3
 
 
-def image_contents_from_url(url: str, tries=3) -> bytes:
+def image_contents_from_url(url: str, tries=MAX_TRIES) -> bytes:
     for _ in range(tries):
         try:
             response = requests.get(url)
