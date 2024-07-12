@@ -57,7 +57,8 @@ python manage.py importplace placename.json
 ### .env contents:
 ```
 DJANGO_SECRET=django_secret_key   
-DJANGO_DEBUG=False
+DJANGO_DEBUG=Fals   
+ALLOWED_HOSTS=127.0.0.1,localhost,your.website.name
 ```
 
 **DJANGO_SECRET** - A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.   
