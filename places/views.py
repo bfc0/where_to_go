@@ -11,16 +11,17 @@ def all_places(request):
     return render(request, "index.html", {"places": serialized_places})
 
 
-def details(request, id):
-    place: Place = get_object_or_404(Place.objects.prefetch_related("imgs"), id=id)
+def details(request, place_id):
+    place: Place = get_object_or_404(
+        Place.objects.prefetch_related("imgs"), id=place_id)
 
     as_dict = {
         "title": place.title,
-        "description_short": place.description_short,
-        "description_long": place.description_long,
+        "description_short": place.short_description,
+        "description_long": place.long_description,
         "coordinates": {
-            "lng": place.coordinates.lng,
-            "lat": place.coordinates.lat,
+            "lng": place.longitude,
+            "lat": place.latitude,
         },
         "imgs": [img.image.url for img in place.imgs.all()],
     }

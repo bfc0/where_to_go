@@ -3,13 +3,7 @@ from django.utils.html import format_html
 from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
 from django.db import models
 from tinymce.widgets import TinyMCE
-from .models import Place, Image, Coordinates
-
-
-class CoordinatesInline(admin.StackedInline):
-    model = Coordinates
-    can_delete = False
-    verbose_name_plural = Coordinates
+from .models import Place, Image
 
 
 class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
@@ -27,10 +21,11 @@ class ImageInline(SortableInlineAdminMixin, admin.TabularInline):
 
 @admin.register(Place)
 class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
-    inlines = [CoordinatesInline, ImageInline]
-    list_display = ["title", "description_short", "description_long"]
-    list_filter=["title"]
-    search_fields=["title"]
+    inlines = [ImageInline]
+    list_display = ["title", "short_description",
+                    "long_description", "longitude", "latitude"]
+    list_filter = ["title"]
+    search_fields = ["title"]
 
     formfield_overrides = {
         models.TextField: {"widget": TinyMCE()},

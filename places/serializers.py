@@ -13,11 +13,11 @@ def serialize_places(places_list):
             "type": "Feature",
             "geometry": {
                 "type": "Point",
-                "coordinates": [place.coordinates.lng, place.coordinates.lat],
+                "coordinates": [place.longitude, place.latitude],
             },
             "properties": {
-                "title": place.onmap_title,
-                "placeId": place.onmap_title,
+                "title": place.title,
+                "placeId": place.title,
                 "detailsUrl": place.get_api_url(),
             },
         }

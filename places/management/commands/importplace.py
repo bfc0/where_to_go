@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from places.models import Place, Coordinates, Image
+from places.models import Place, Image
 
 
 def image_contents_from_url(url: str, tries=3) -> bytes:
@@ -35,10 +35,11 @@ class Command(BaseCommand):
 
                 place, created = Place.objects.get_or_create(
                     title=place_as_dict["title"],
-                    onmap_title=place_as_dict["title"],
                     defaults={
-                        "description_short": place_as_dict["description_short"],
-                        "description_long": place_as_dict["description_long"],
+                        "short_description": place_as_dict["description_short"],
+                        "long_description": place_as_dict["description_long"],
+                        "longitude": place_as_dict["coordinates"]["lng"],
+                        "latitude": place_as_dict["coordinates"]["lat"],
                     },
                 )
 
@@ -48,14 +49,7 @@ class Command(BaseCommand):
                     )
                     return
 
-                coords, _ = Coordinates.objects.get_or_create(
-                    lng=place_as_dict["coordinates"]["lng"],
-                    lat=place_as_dict["coordinates"]["lat"],
-                    place=place,
-                )
-
-                coords.place = place
-                coords.save()
+                place.save()
 
                 for idx, url in enumerate(place_as_dict["imgs"], start=1):
                     img_content = image_contents_from_url(url)
@@ -69,8 +63,10 @@ class Command(BaseCommand):
                         image.save()
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Error occurred: {e} for {place}"))
+            self.stdout.write(self.style.ERROR(
+                f"Error occurred: {e} for {place}"))
         else:
             self.stdout.write(
-                self.style.SUCCESS(f"Place {place.title} imported successfully")
+                self.style.SUCCESS(
+                    f"Place {place.title} imported successfully")
             )
