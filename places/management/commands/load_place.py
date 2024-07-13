@@ -49,9 +49,11 @@ class Command(BaseCommand):
                         continue
 
                     filename = urlparse(url).path.split("/")[-1]
-                    image = Image(place=place, order=image_order)
-                    image.image.save(filename, ContentFile(image_content))
-                    image.save()
+                    Image.objects.create(
+                        place=place,
+                        order=image_order,
+                        image=ContentFile(image_content, name=filename)
+                    )
                     image_order += 1
 
         except Exception as e:
