@@ -35,10 +35,6 @@ class PlacesAdmin(SortableAdminBase, admin.ModelAdmin):
     list_filter = ["title"]
     search_fields = ["title"]
 
-    formfield_overrides = {
-        models.TextField: {"widget": TinyMCE()},
-    }
-
 
 @admin.register(Image)
 class ImagesAdmin(admin.ModelAdmin):
