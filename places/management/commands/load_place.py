@@ -30,8 +30,6 @@ def json_from_url(url: str, tries=MAX_TRIES) -> dict:
             if "text/plain" in response.headers.get("Content-Type"):
                 content = response.content.decode(response.encoding or 'utf-8')
                 return json.loads(content)
-            else:
-                print(response.headers.get("Content-Type"))
 
         except requests.exceptions.RequestException:
             continue
