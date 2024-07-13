@@ -2,21 +2,12 @@ import json
 import requests
 from urllib.parse import urlparse
 from django.core.files.temp import NamedTemporaryFile
+from django.core.files.base import ContentFile
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from places.models import Place, Image
-MAX_TRIES = 3
-
-
-def image_contents_from_url(url: str, tries=MAX_TRIES) -> bytes:
-    for _ in range(tries):
-        try:
-            response = requests.get(url)
-            if "image" in response.headers.get("Content-Type", ""):
-                return response.content
-        except requests.exceptions.RequestException:
-            continue
-    raise Exception("Failed to fetch data for image")
+from ._utils import fetch_image_content
 
 
 class Command(BaseCommand):
@@ -45,27 +36,28 @@ class Command(BaseCommand):
                 )
 
                 if not created:
-                    self.stdout.write(
+                    self.stderr.write(
                         self.style.ERROR(f"Place {place.title} already exists")
                     )
                     return
 
-                place.save()
+                image_order = 1
+                for url in serialized_place["imgs"]:
+                    image_content = fetch_image_content(url)
+                    if image_content is None:
+                        self.stderr.write(
+                            f"Failed to fetch an image for {place}")
+                        continue
 
-                for idx, url in enumerate(serialized_place["imgs"], start=1):
-                    img_content = image_contents_from_url(url)
                     filename = urlparse(url).path.split("/")[-1]
-
-                    with NamedTemporaryFile(delete=True) as temp_file:
-                        temp_file.write(img_content)
-                        temp_file.flush()
-                        image = Image(place=place, order=idx)
-                        image.image.save(filename, temp_file)
-                        image.save()
+                    image = Image(place=place, order=image_order)
+                    image.image.save(filename, ContentFile(image_content))
+                    image.save()
+                    image_order += 1
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(
-                f"Error occurred: {e} for {place}"))
+            self.stderr.write(self.style.ERROR(
+                f"Error occurred: {e} for {serialized_place['title']}"))
         else:
             self.stdout.write(
                 self.style.SUCCESS(

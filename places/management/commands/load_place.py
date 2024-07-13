@@ -1,43 +1,16 @@
 import json
 import requests
 from urllib.parse import urlparse
-from django.core.files.temp import NamedTemporaryFile
+from django.core.files.base import ContentFile
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from places.models import Place, Image
-MAX_TRIES = 3
-
-
-def image_contents_from_url(url: str, tries=MAX_TRIES) -> bytes:
-    for _ in range(tries):
-        try:
-            response = requests.get(url)
-            if "image" in response.headers.get("Content-Type", ""):
-                return response.content
-        except requests.exceptions.RequestException:
-            continue
-    raise Exception("Failed to fetch data for image")
-
-
-def json_from_url(url: str, tries=MAX_TRIES) -> dict:
-    headers = {"Accept": "application/json"}
-    for _ in range(tries):
-        try:
-            response = requests.get(url, headers=headers)
-            if "application/json" in response.headers.get("Content-Type", ""):
-                return response.json()
-
-            if "text/plain" in response.headers.get("Content-Type"):
-                content = response.content.decode(response.encoding or 'utf-8')
-                return json.loads(content)
-
-        except requests.exceptions.RequestException:
-            continue
-    raise Exception("Failed to fetch JSON data")
+from ._utils import fetch_image_content, fetch_json
 
 
 class Command(BaseCommand):
-    help = "Imports Place from JSON file"
+    help = "Imports Place from JSON url"
 
     def add_arguments(self, parser):
         parser.add_argument("url", type=str)
@@ -47,7 +20,7 @@ class Command(BaseCommand):
         place = None
 
         try:
-            serialized_place = json_from_url(url)
+            serialized_place = fetch_json(url)
 
             with transaction.atomic():
 
@@ -62,26 +35,27 @@ class Command(BaseCommand):
                 )
 
                 if not created:
-                    self.stdout.write(
+                    self.stderr.write(
                         self.style.ERROR(f"Place {place.title} already exists")
                     )
                     return
 
-                place.save()
+                image_order = 1
+                for url in serialized_place["imgs"]:
+                    image_content = fetch_image_content(url)
+                    if image_content is None:
+                        self.stderr.write(
+                            f"Failed to fetch an image for {place}")
+                        continue
 
-                for idx, url in enumerate(serialized_place["imgs"], start=1):
-                    img_content = image_contents_from_url(url)
                     filename = urlparse(url).path.split("/")[-1]
-
-                    with NamedTemporaryFile(delete=True) as temp_file:
-                        temp_file.write(img_content)
-                        temp_file.flush()
-                        image = Image(place=place, order=idx)
-                        image.image.save(filename, temp_file)
-                        image.save()
+                    image = Image(place=place, order=image_order)
+                    image.image.save(filename, ContentFile(image_content))
+                    image.save()
+                    image_order += 1
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(
+            self.stderr.write(self.style.ERROR(
                 f"Error occurred: {e} for {place}"))
         else:
             self.stdout.write(
