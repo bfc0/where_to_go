@@ -1,5 +1,3 @@
-import json
-import requests
 from urllib.parse import urlparse
 from django.core.files.base import ContentFile
 
